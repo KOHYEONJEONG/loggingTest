@@ -27,12 +27,13 @@ public class SimpleShortenUrlService {
     public ShortenUrlCreateResponseDto generateShortenUrl(ShortenUrlCreateRequestDto shortenUrlCreateRequestDto) {
 
         //로그레벨 구분하여 찍기
-//        log.info();
+        log.info("generateShortenUrl {}", shortenUrlCreateRequestDto.getOriginalUrl());
         String originalUrl = shortenUrlCreateRequestDto.getOriginalUrl();
         String shortenUrlKey = getUniqueShortenUrlKey();
 
         ShortenUrl shortenUrl = new ShortenUrl(originalUrl, shortenUrlKey);
         shortenUrlRepository.saveShortenUrl(shortenUrl);
+        log.info("shortenUrl {}", shortenUrl);//originalUrl, shortenUrlKey 을 한번에 출력
 
         ShortenUrlCreateResponseDto shortenUrlCreateResponseDto = new ShortenUrlCreateResponseDto(shortenUrl);
         return shortenUrlCreateResponseDto;

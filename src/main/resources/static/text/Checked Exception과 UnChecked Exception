@@ -1,0 +1,96 @@
+
+예외(Exception)
+
+🚨오답
+“Checked Exception은 컴파일 할 때 발생하고,
+Unchecked Exception은 런타임에 발생하는 예외로 알고 있습니다.”
+
+Checked Exception → 컴파일 타임?
+Unchecked Exception → 런 타임?
+
+- 예외는 컴파일 시점에 발생하지 않는다.( 예외는 모두 런타임 시점에 발생한다. )
+- 예외가 아닌 문법적인 오류 때문에 발생하는 컴파일 에러인것이다.
+
+🚩정답
+“Checked Exception은 컴파일 할 때 예외에 대한 처리를 '⭐강제'하고,
+Unchecked Exception은 예외에 대한 처리를 '⭐강제하지 않습니다.'”
+
+Checked Exception → 예외 처리 강제
+Unchecked Exception → 예외 처리 강제 안함
+
+
+📌강제한다?
+예외처리를 강제한다는 말의 의미는 예외가 발생할 경우에 대해
+try-catch문으로 감싸거나
+throws로 메서드 바깥으로 던지거나
+-> 즉, 던지는 것을 강제한다는 의미이다.
+
+예시1. try-catch
+try {
+    throw new CheckedException();
+}catch (CheckedException e){
+}
+
+예시2. throws
+public static void main(String[] args) throws CheckedException{
+    throw new CheckedException();
+}
+--> 이런식으로 CheckedException 을 컴파일 시점에 강제한다.
+
+🚨여기서 오해하면 안되는 것(아래)
+⭕UnChecked Exception도 try-catch문 사용가능하다
+- 예외 처리를 강제하지 않을 뿐 try-catch 같은 걸 사용하여 예외를 처리할 수 있다.
+try {
+    throw new UnCheckedException();
+}catch (UnCheckedException e){
+}
+
+라이브러리가 아닌 직접 예외를 정의해서 사용가능하다.
+✅사용자 정의 예외 (UnCheckedException):extends RuntimeException
+->> 보통 개발자들은 RuntimeException이라고 하면 CheckedException으로 알고 있다.
+BUT
+UnCheckedException 이다.
+ㄴ try-catch나, throw 사용 없이 바로 예외 후출 가능하다.
+
+   throw new NotFoundShortenUrlException("단축 URL을 찾지 못했습니다. shortenUrlKey = "+shortenUrlKey);
+
+✅사용자 정의 예외 (CheckedException):extends Exception
+ㄴ 단 try-catch나, throws 로 감싸줘야 코드상에서 빨간줄이 안뜬다.
+
+try{
+     throw new NotFoundShortenUrlException("단축 URL을 찾지 못했습니다. shortenUrlKey = "+shortenUrlKey);
+}catch(NotFoundShortenUrlException e){
+    //여기로 이동
+    // 예외 처리 로직 작성
+
+}
+
+또는
+
+현재 메소드에 throws NotFoundShortenUrlException
+- throw new NotFoundShortenUrlException();
++
+추가로
+저 메소드를 호출한 함수에서도 throws를 해줘야한다. (타고 타고)
+
+이렇게 해야지 글로벌 Exception에서 핸들링이 가능해진다.
+-> 불편하지? 불필요한 코드가 생기기도 해
+
+-=======================================================================
+
+(Error)오류
+ -> 코드에서 예상하기 어렵다
+
+오류 자체가 발생하지 않도록 여러가지 해결 방법을 적용하는게 더 적절하다.
+에러의 대표적인 예시로는
+1. 힙메모리 부족 시 발생 : out-of-memory 에러
+2. 재귀함수에서 발생하는  : stack overflow 에러
+
+=========================================================================
+
+권장 (예외 핸들링에 유용함)
+-> UnCheckedException
+
+=========================================================================
+이제 '로그 레벨'을 공부하자
+예외와 밀접한 관계가 있다.

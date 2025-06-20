@@ -40,15 +40,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNotFoundShortenUrlException(
             NotFoundShortenUrlException ex
     ) {
-        log.info(ex.getMessage());//getMessage로 message 내용을 꺼내옴. (개발자가 보는 로그 값)
-//        log.error("{}",ex);
-        return new ResponseEntity<>("단축 URL을 찾지 못했습니다.", HttpStatus.NOT_FOUND);//404, 사용자가 보는 값
+        //트러블 슈팅에 도움되기 위해서는 어떤 값으로 접근했는지 찍어주는게 좋겠지? (ex)
+        log.info(ex.getMessage());//getMessage로 message 내용을 꺼내옴. (🚩개발자가 보는 로그 값)
+        /*
+         *       시간           |  레벨 (INFO) |   PID (10964)  |   스레드 이름 ([nio-8080-exec-1])  |  패키지 + 클래스(k.c.s.p.GlobalExceptionHandler)
+         *
+         * 2025-06-13T15:23:11.153+09:00  INFO 10964 --- [nio-8080-exec-1] k.c.s.p.GlobalExceptionHandler           : 단축 URL을 찾지 못했습니다. shortenUrlKey = 블라블라
+         * */
+
+
+
+        return new ResponseEntity<>("단축 URL을 찾지 못했습니다.", HttpStatus.NOT_FOUND);//404, 🚩사용자가 보는 값
     }
 
-    /*
-    *       시간      |  레벨 (INFO)    |   PID (10964)     |   스레드 이름 ([nio-8080-exec-1])  |  패키지 + 클래스(k.c.s.p.GlobalExceptionHandler)
-     *
-    * 2025-06-13T15:23:11.153+09:00  INFO 10964 --- [nio-8080-exec-1] k.c.s.p.GlobalExceptionHandler           : 단축 URL을 찾지 못했습니다. shortenUrlKey = ㄴㄹㅇㄹㄷ
-    * */
 
 }
