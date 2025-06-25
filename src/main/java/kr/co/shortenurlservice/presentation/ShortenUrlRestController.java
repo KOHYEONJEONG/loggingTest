@@ -25,20 +25,16 @@ public class ShortenUrlRestController {
     }
 
     @RequestMapping(value = "/shortenUrl", method = RequestMethod.POST)
-    public ResponseEntity<ShortenUrlCreateResponseDto> createShortenUrl(
-            @Valid @RequestBody ShortenUrlCreateRequestDto shortenUrlCreateRequestDto
-    ) {
+    public ResponseEntity<ShortenUrlCreateResponseDto> createShortenUrl(@Valid @RequestBody ShortenUrlCreateRequestDto shortenUrlCreateRequestDto) {
 //        log.trace("createShortenUrl {} :",shortenUrlCreateRequestDto.getOriginalUrl());
-        log.trace("ShortenUrlCreateRequestDto {} :",shortenUrlCreateRequestDto);
+        log.trace("ShortenUrlCreateRequestDto {} :",shortenUrlCreateRequestDto);//어떤 요청이 들었왔는지 dto를 통째로 불러와서 찍어주기(엄청난 크기가 찍힐 수 있다. - 어느정도 기간을 보관할건지 전략적으로~)
         ShortenUrlCreateResponseDto shortenUrlCreateResponseDto =
                 simpleShortenUrlService.generateShortenUrl(shortenUrlCreateRequestDto);
         return ResponseEntity.ok(shortenUrlCreateResponseDto);
     }
 
     @RequestMapping(value = "/{shortenUrlKey}", method = RequestMethod.GET)
-    public ResponseEntity<?> redirectShortenUrl(
-            @PathVariable String shortenUrlKey
-    ) throws URISyntaxException {
+    public ResponseEntity<?> redirectShortenUrl(@PathVariable String shortenUrlKey) throws URISyntaxException {
         String originalUrl = simpleShortenUrlService.getOriginalUrlByShortenUrlKey(shortenUrlKey);
 
         URI redirectUri = new URI(originalUrl);
