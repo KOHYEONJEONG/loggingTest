@@ -27,7 +27,7 @@ public class ShortenUrlRestController {
     @RequestMapping(value = "/shortenUrl", method = RequestMethod.POST)
     public ResponseEntity<ShortenUrlCreateResponseDto> createShortenUrl(@Valid @RequestBody ShortenUrlCreateRequestDto shortenUrlCreateRequestDto) {
 //        log.trace("createShortenUrl {} :",shortenUrlCreateRequestDto.getOriginalUrl());
-        log.trace("ShortenUrlCreateRequestDto {} :",shortenUrlCreateRequestDto);//어떤 요청이 들었왔는지 dto를 통째로 불러와서 찍어주기(엄청난 크기가 찍힐 수 있다. - 어느정도 기간을 보관할건지 전략적으로~)
+        log.trace("ShortenUrlCreateRequestDto {} :",shortenUrlCreateRequestDto);//url 하나씩만 찍어주면 ㄴ어떤 요청이 들었왔는지 dto를 통째로 불러와서 찍어주기(엄청난 크기가 찍힐 수 있다. - 어느정도 기간을 보관할건지 전략적으로~)
         ShortenUrlCreateResponseDto shortenUrlCreateResponseDto =
                 simpleShortenUrlService.generateShortenUrl(shortenUrlCreateRequestDto);
         return ResponseEntity.ok(shortenUrlCreateResponseDto);
