@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler { //에러 핸들링 관리
 
 /*
     [아래로 갈수록 더 심각하거나 중요한 로그(더 높은 레벨)]
@@ -21,8 +21,8 @@ public class GlobalExceptionHandler {
             ㄴ 다만 모든 로그를 인포 레벨로 찍으면 로그 레벨을 제대로 활용할 수 없기 때문에 무분별하게 남기지는것은 좋은 습관이 아니다.
             ㄴ 오류는 아니면서도, 시스템에서 중요한 기능의 실행이나 혹은 비즈니스 로직 실행 결과 같은걸 인포레벨로 찍자.
         * WARN - 경고, 당장 문제는 되지 않지만 잠재적으로 문제가 될 수 있는 상황을 나타내지만, 시스템 운영에는 즉각적으니 영향을 주지 않는 경우 사용 (일단 두고, api 응답 시간이 60초가 넘게 알람이 10번이상 오게되면 성능개선을 하겟다.)
-        * ERROR - 치명적이지 않지만, 중요한 문제가 발생했을때 나타냅니다. 복구가 필요하거나 실패한 작업을 추적해야 할 때 사용 ( 로직 실행 시 에러, 장애 )
-        * FETAL(페이탈) - 시스템 운영을 계속할 수 없을 정도로 심각한 오류가 발생했을 때 사용(개발자가 직접 개입해야하는 상황)
+        * ERROR - 치명적이지 않지만, 중요한 문제가 발생했을때 나타냅니다. 복구가 필요하거나 실패한 작업을 추적해야 할 때 사용 ( 로직 실행 시 에러, 장애  - 담당자가 개입해야하는 에러라면)
+        * FETAL(페이탈) - 시스템 운영을 계속할 수 없을 정도로 심각한 오류가 발생했을 때 사용
 
 
 
@@ -44,6 +44,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNotFoundShortenUrlException(NotFoundShortenUrlException ex) {
         //트러블 슈팅에 도움되기 위해서는 어떤 값으로 접근했는지 찍어주는게 좋겠지? (ex)
         log.info(ex.getMessage());//getMessage로 message 내용을 꺼내옴. (🚩개발자가 보는 로그 값)
+        //log.warn(ex.getMessage());//담당자가 개입해야하는 에러라면 warn 레벨찍기
         /*
          *       시간           |  레벨 (INFO) |   PID (10964)  |   스레드 이름 ([nio-8080-exec-1])  |  패키지 + 클래스(k.c.s.p.GlobalExceptionHandler)
          *

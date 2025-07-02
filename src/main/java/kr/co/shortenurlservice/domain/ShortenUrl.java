@@ -1,7 +1,10 @@
 package kr.co.shortenurlservice.domain;
 
+import lombok.ToString;
+
 import java.util.Random;
 
+@ToString //로그에 참조값으로 나오는걸 방지하기 위해
 public class ShortenUrl {
     private String originalUrl;
     private String shortenUrlKey;
