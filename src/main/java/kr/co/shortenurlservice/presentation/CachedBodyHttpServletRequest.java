@@ -9,7 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 //HttpServletRequestWrapper 기능 찾아보기
-public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
+public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {//중요, 찾아보기
 
     private  final  byte[] cachedBody;//stream은 한번 가져온 값은 읽고 지우기 때문에 캐시에 담아놓고 사용하기에
     public CachedBodyHttpServletRequest(HttpServletRequest request)  throws IOException {
@@ -18,6 +18,7 @@ public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
 
     }
 
+    @Override
     public ServletInputStream getInputStream(){
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(cachedBody);
         return new ServletInputStream() {
