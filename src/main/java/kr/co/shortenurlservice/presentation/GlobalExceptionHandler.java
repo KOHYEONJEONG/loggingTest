@@ -1,10 +1,12 @@
 package kr.co.shortenurlservice.presentation;
 
+import jakarta.servlet.http.HttpSession;
 import kr.co.shortenurlservice.domain.LackOfShortenUrlKeyException;
 import kr.co.shortenurlservice.domain.NotFoundShortenUrlException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -43,7 +45,7 @@ public class GlobalExceptionHandler { //에러 핸들링 관리
     @ExceptionHandler(NotFoundShortenUrlException.class)
     public ResponseEntity<String> handleNotFoundShortenUrlException(NotFoundShortenUrlException ex) {
         //트러블 슈팅에 도움되기 위해서는 어떤 값으로 접근했는지 찍어주는게 좋겠지? (ex)
-        log.info(ex.getMessage());//getMessage로 message 내용을 꺼내옴. (🚩개발자가 보는 로그 값)
+        log.error(ex.getMessage());//getMessage로 message 내용을 꺼내옴. (🚩개발자가 보는 로그 값)
         //log.warn(ex.getMessage());//담당자가 개입해야하는 에러라면 warn 레벨찍기
         /*
          *       시간           |  레벨 (INFO) |   PID (10964)  |   스레드 이름 ([nio-8080-exec-1])  |  패키지 + 클래스(k.c.s.p.GlobalExceptionHandler)
@@ -51,6 +53,22 @@ public class GlobalExceptionHandler { //에러 핸들링 관리
          * 2025-06-13T15:23:11.153+09:00  INFO 10964 --- [nio-8080-exec-1] k.c.s.p.GlobalExceptionHandler           : 단축 URL을 찾지 못했습니다. shortenUrlKey = 블라블라
          * */
         return new ResponseEntity<>("단축 URL을 찾지 못했습니다.", HttpStatus.NOT_FOUND);//404, 🚩사용자가 보는 값
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
+//          이런 형식으로 요청 파라미터가 넘어온다면
+//        {
+//            "originalUrl": "HTTP://"
+//        }
+        
+        StringBuilder errorMessage = new StringBuilder("유효성 검증 실패/ ");
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+           errorMessage.append(String.format("필드) %s / 설명) %s", error.getField(), error.getDefaultMessage()));
+           //사용자 응답 BODY => 유효성 검증 실패: 필드 originalUrl : 올바른 URL이어야 합니다
+        });
+
+        return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
 
 

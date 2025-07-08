@@ -11,7 +11,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class LoggingFilter implements Filter {
+public class LoggingFilter implements Filter {//톰캣이 전달한 실제 요청 객체 (HttpServletRequest) 를 가장 먼저 접할 수 있는 곳
+
+//    필터가 톰캣과 가까운 이유
+//    💥필터는 서블릿(=스프링 진입)보다 먼저 실행됨
+//    💥톰캣이 요청을 받을 때 가장 먼저 만나는 컴포넌트
+//    스프링 MVC를 쓰든 안 쓰든 무조건 실행됨
+
+    //순서 : 클라이언트 요청 -> 필터(서블릿 컨테이너(tomcat)단계) -> 서블릿(디스패쳐 서블릿, 스프링 mvc 진입) -> 인터셉터 -> 컨트롤러
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -24,15 +31,6 @@ public class LoggingFilter implements Filter {
         log.info("요청 필터 진입");
 
         /* if(request instanceof HttpServletRequest httpServletRequest){
-        * 🔸 의미 1: 타입 확인
-            request 객체가 HttpServletRequest 타입인지 확인해.
-
-            🔸 의미 2: 조건이 true일 경우, 변수 선언과 자동 캐스팅
-            만약 request가 HttpServletRequest의 인스턴스라면
-            → httpRequest라는 새로운 지역 변수를 만들고,
-            → HttpServletRequest 타입으로 자동 캐스팅된 request를 담아줘.
-            *
-            *  if(request instanceof HttpServletRequest httpServletRequest){
             // getRequestURI()는 ServletRequest에는 없고, HttpServletRequest 인터페이스에만 존재하는 메서드야.
             String url = httpServletRequest.getRequestURI();
             String method = httpServletRequest.getMethod();
@@ -44,6 +42,9 @@ public class LoggingFilter implements Filter {
 
         }
         * */
+
+        //ServletRequest 부모 > HttpServletRequest 하위 타입
+        //조건 :  서블릿 컨테이너에서 전달된 요청이 HTTP 요청인지 확인하고, 스프링 진입 전 필터 단계에서 안전하게 HttpServletRequest로 꺼내 쓰기 위한 조건문
         if(request instanceof HttpServletRequest httpServletRequest) {
             CachedBodyHttpServletRequest wrappedRequest = new CachedBodyHttpServletRequest(httpServletRequest);
             String url = wrappedRequest.getRequestURI();
@@ -51,10 +52,15 @@ public class LoggingFilter implements Filter {
             String body = wrappedRequest.getReader().lines().reduce("",String::concat);//캐시된 스크림 읽어오기
 
             log.trace("Incoming Request: URL={}, Method={}, Body={}", url, method, body);
+
+            // 래핑된 요청 객체를 다음 필터 체인으로 전달
+            filterChain.doFilter(wrappedRequest, response);// 다음 필터 or 서블릿 실행
+        }else{
+            // HttpServletRequest가 아닌 경우 그대로 전달
+            filterChain.doFilter(request, response);
         }
 
-        // 다음 필터 or 서블릿 실행
-        filterChain.doFilter(request, response);
+
 
         log.info("응답 필터 종료");
     }
