@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 //HttpServletRequestWrapper 기능 찾아보기
-public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
+public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {//중요, 찾아보기
 
     private  final  byte[] cachedBody;//stream은 한번 가져온 값은 읽고 지우기 때문에 캐시에 담아놓고 재사용하자.
     public CachedBodyHttpServletRequest(HttpServletRequest request)  throws IOException {

@@ -36,8 +36,7 @@ public class LoggingFilter implements Filter {//톰캣이 전달한 실제 요�
             String method = httpServletRequest.getMethod();
             String body = getRequestBody(httpServletRequest);
 
-            //트레이스 레벨에는 요청에 대한 어떤 요청이 들어왔고
-            // 어떤 경로, 어떤 메서드, 그리고 어떤 요청 body로 들어왔는지 같은 굉장히 디테일한 정보에 대해서 남기도록 할거임.
+
             log.trace("Incoming Request: URL={}, Method={}, Body={}", url, method, body);
 
         }
@@ -51,6 +50,9 @@ public class LoggingFilter implements Filter {//톰캣이 전달한 실제 요�
             String method = wrappedRequest.getMethod();
             String body = wrappedRequest.getReader().lines().reduce("",String::concat);//캐시된 스크림 읽어오기
 
+            // INFO : 비즈니스 로직~
+            // TRACE : 레벨에는 어떤 요청이 들어왔고 (여기서는 TRACE 선택)
+            // 어떤 경로, 어떤 메서드, 그리고 어떤 요청 body로 들어왔는지 같은 굉장히 디테일한 정보에 대해서 남기도록 할거임.
             log.trace("Incoming Request: URL={}, Method={}, Body={}", url, method, body);
 
             // 래핑된 요청 객체를 다음 필터 체인으로 전달
@@ -65,14 +67,19 @@ public class LoggingFilter implements Filter {//톰캣이 전달한 실제 요�
         log.info("응답 필터 종료");
     }
 
-//    private  String getRequestBody(HttpServletRequest request){
-//        try(BufferedReader reader = request.getReader()){
-//            return  reader.lines().collect(Collectors.joining(System.lineSeparator()));
-//        }catch (IOException e){
-//            log.error("Failed to read request body", e);
-//            return  "Unable to read request body";
-//        }
-//    }
+   /*
+   private  String getRequestBody(HttpServletRequest request){
+    //지나간 스트림은 읽을 수 없다. 한번만 읽을 수 있기 때문에 getReader() hs already called for this request 에러가 출력된다.
+    CachedBodyHttpServletRequest.java를 통해 body값을 캐시에 저장해서 사용했다.
+        try(BufferedReader reader = request.getReader()){
+            return  reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        }catch (IOException e){
+            log.error("Failed to read request body", e);
+            return  "Unable to read request body";
+        }
+    }
+    *./
+    */
 
 
     @Override
