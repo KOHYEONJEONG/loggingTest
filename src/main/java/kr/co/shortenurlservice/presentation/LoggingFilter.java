@@ -13,10 +13,16 @@ import java.util.stream.Collectors;
 @Component
 public class LoggingFilter implements Filter {//톰캣이 전달한 실제 요청 객체 (HttpServletRequest) 를 가장 먼저 접할 수 있는 곳
 
-//    필터가 톰캣과 가까운 이유
-//    💥필터는 서블릿(=스프링 진입)보다 먼저 실행됨
-//    💥톰캣이 요청을 받을 때 가장 먼저 만나는 컴포넌트
-//    스프링 MVC를 쓰든 안 쓰든 무조건 실행됨
+
+//  필터 : 컨트롤러로 들어오고 나가는 요청과 응답에 대해서 우리가 추가적인 동작을 끼워 넣을 수 있는 곳
+// 서블릿 스펙 기반(스프링과 별개)
+
+//    가장 먼저 요청을 가로챌 수 있는 위치이고
+//
+//    🚩🚩getInputStream()은 단 한 번만 읽을 수 있기 때문에,
+//    🚩🚩DispatcherServlet보다 먼저 캐싱하지 않으면 다시 못 읽어
+//
+//    즉, Wrapper로 감싸려면 필터에서 미리 감싸야 안전
 
     //순서 : 클라이언트 요청 -> 필터(서블릿 컨테이너(tomcat)단계) -> 서블릿(디스패쳐 서블릿, 스프링 mvc 진입) -> 인터셉터 -> 컨트롤러
 
@@ -46,17 +52,20 @@ public class LoggingFilter implements Filter {//톰캣이 전달한 실제 요�
         //조건 :  서블릿 컨테이너에서 전달된 요청이 HTTP 요청인지 확인하고, 스프링 진입 전 필터 단계에서 안전하게 HttpServletRequest로 꺼내 쓰기 위한 조건문
         if(request instanceof HttpServletRequest httpServletRequest) {
             CachedBodyHttpServletRequest wrappedRequest = new CachedBodyHttpServletRequest(httpServletRequest);
-            String url = wrappedRequest.getRequestURI();
+            String url = wrappedRequest.getRequestURI(); //@PathVariable 값은 여기 
             String method = wrappedRequest.getMethod();
             String body = wrappedRequest.getReader().lines().reduce("",String::concat);//캐시된 스크림 읽어오기
+            String queryString = wrappedRequest.getQueryString();// 쿼리스트링
 
             // INFO : 비즈니스 로직~
             // TRACE : 레벨에는 어떤 요청이 들어왔고 (여기서는 TRACE 선택)
             // 어떤 경로, 어떤 메서드, 그리고 어떤 요청 body로 들어왔는지 같은 굉장히 디테일한 정보에 대해서 남기도록 할거임.
-            log.trace("Incoming Request: URL={}, Method={}, Body={}", url, method, body);
+            log.trace("Incoming Request: URL={}, Method={}, QueryString={}, Body={}", url, method, queryString, body);
 
             // 래핑된 요청 객체를 다음 필터 체인으로 전달
             filterChain.doFilter(wrappedRequest, response);// 다음 필터 or 서블릿 실행
+
+            log.trace("Incoming End");
         }else{
             // HttpServletRequest가 아닌 경우 그대로 전달
             filterChain.doFilter(request, response);

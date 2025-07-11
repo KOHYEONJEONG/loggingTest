@@ -39,6 +39,7 @@ public class GlobalExceptionHandler { //에러 핸들링 관리
             LackOfShortenUrlKeyException ex
     ) {
         // 개발자에게 알려줄 수 있는 수단 필요
+        log.error("");
         return new ResponseEntity<>("단축 URL 자원이 부족합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -61,7 +62,7 @@ public class GlobalExceptionHandler { //에러 핸들링 관리
 //        {
 //            "originalUrl": "HTTP://"
 //        }
-        
+
         StringBuilder errorMessage = new StringBuilder("유효성 검증 실패/ ");
         ex.getBindingResult().getFieldErrors().forEach(error -> {
            errorMessage.append(String.format("필드) %s / 설명) %s", error.getField(), error.getDefaultMessage()));
