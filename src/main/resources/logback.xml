@@ -1,0 +1,30 @@
+<configuration>
+    <property name="LOG_FILE" value="application-dev.log"/>
+    <!--    파일 생성 위치 : C:\Users\KHJ\Desktop\Study\Spring강의\workspace\loggingTest\application-dev.log-->
+
+    <!-- 콘솔 출력 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일 출력 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>application.%d{yyyy-MM-dd_HH-mm}.log</fileNamePattern>  <!-- 보통은 일단위로 사용함.-->
+<!--            <fileNamePattern>application.%d{yyyy-MM-dd_HH-mm}.log.gz</fileNamePattern> 파일이 압축되면서 용량도 줄어든다.(파일 압축 해제 : gunzip  파일명.gz)-->
+            <maxHistory>5</maxHistory> <!--5분이 넘어가는 로그는 없어지게-->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger 설정 (위 2개 appender의 name을 적어주면 됨.)-->
+    <root level="info">
+        <appender-ref ref="CONSOLE" />  <!--주석 처리하면 콘솔에 로그 안 찍힘.-->
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

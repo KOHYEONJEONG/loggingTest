@@ -39,7 +39,7 @@ public class GlobalExceptionHandler { //에러 핸들링 관리
             LackOfShortenUrlKeyException ex
     ) {
         // 개발자에게 알려줄 수 있는 수단 필요
-        log.error("");
+        log.error("단축 URL 자원이 부족합니다. {}", HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>("단축 URL 자원이 부족합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -56,18 +56,24 @@ public class GlobalExceptionHandler { //에러 핸들링 관리
         return new ResponseEntity<>("단축 URL을 찾지 못했습니다.", HttpStatus.NOT_FOUND);//404, 🚩사용자가 보는 값
     }
 
+    // 요청 파리미터가 잘못될 경우 뜨는 에러
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
 //          이런 형식으로 요청 파라미터가 넘어온다면
 //        {
-//            "originalUrl": "HTTP://"
+//            "originalUrl2": "HTTP://"
 //        }
 
-        StringBuilder errorMessage = new StringBuilder("유효성 검증 실패/ ");
+        StringBuilder errorMessage = new StringBuilder("유효성 검증 실패: ");
         ex.getBindingResult().getFieldErrors().forEach(error -> {
-           errorMessage.append(String.format("필드) %s / 설명) %s", error.getField(), error.getDefaultMessage()));
-           //사용자 응답 BODY => 유효성 검증 실패: 필드 originalUrl : 올바른 URL이어야 합니다
+           errorMessage.append(String.format("필드 '%s' / 설명 '%s'", error.getField(), error.getDefaultMessage()));
+            //사용자 응답 BODY => 유효성 검증 실패: 필드 'originalUrl' / 설명 '널이어서는 안됩니다'
+            // ㄴ ValidationMessages_ko.properties 파일에서 '널이어서는 안됩니다' 지원해줌
         });
+
+        // 상세 로그
+        //log.warn("잘못된 요청: {}", errorMessage); //(warn : 몇번 이상 발생 시 알림뜨게 사용할거임.)
+        log.debug("잘못된 요청: {}", errorMessage);// 단순히 개발자한테 요청이 온 것을 확인하기 위한 용도라면 debug
 
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }

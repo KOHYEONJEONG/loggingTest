@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/*
+* 컨트롤러에 들어오는 요청들에 로그는 필터에서 찍고
+* 서비스 안에있는 메서드는 AOP에서 로그찍는가봐
+* */
+
 @Slf4j
 @Service
 public class SimpleShortenUrlService {
@@ -24,6 +29,7 @@ public class SimpleShortenUrlService {
         this.shortenUrlRepository = shortenUrlRepository;
     }
 
+    //단축 url 생성(비즈니스 로직 중요한 부분)
     public ShortenUrlCreateResponseDto generateShortenUrl(ShortenUrlCreateRequestDto shortenUrlCreateRequestDto) {
 
         //로그레벨 구분하여 찍기
@@ -33,7 +39,7 @@ public class SimpleShortenUrlService {
 
         ShortenUrl shortenUrl = new ShortenUrl(originalUrl, shortenUrlKey);
         shortenUrlRepository.saveShortenUrl(shortenUrl);
-        log.info("shortenUrl {}", shortenUrl);//originalUrl, shortenUrlKey 을 한번에 출력
+        log.info("shortenUrl 생성 :{}", shortenUrl);//originalUrl, shortenUrlKey 을 한번에 출력
 
         ShortenUrlCreateResponseDto shortenUrlCreateResponseDto = new ShortenUrlCreateResponseDto(shortenUrl);
         return shortenUrlCreateResponseDto;
@@ -45,7 +51,9 @@ public class SimpleShortenUrlService {
         if(null == shortenUrl)
             throw new NotFoundShortenUrlException("단축 URL을 찾지 못했습니다. shortenUrlKey = "+shortenUrlKey);
 
+        // 앞뒤로 redirectCount가 증가되기 전/후 찍어보는것도 좋다.(동시성 문제가 발생되는 부분을 디버그 로그를 찍어 의시되는 부분을 줄여 나가자)
         shortenUrl.increaseRedirectCount();
+
         shortenUrlRepository.saveShortenUrl(shortenUrl);
 
         String originalUrl = shortenUrl.getOriginalUrl();
